@@ -1,5 +1,5 @@
 # gHyPart_TACO
-This is the source code for the original work "gHyPart: GPU-friendly End-to-End Hypergraph Partitioner" accepted by ACM TACO.
+This is the source code repo for the original work "gHyPart: GPU-friendly End-to-End Hypergraph Partitioner" accepted by ACM TACO.
 
 # Build CPU Baseline Works
 `git clone --recurse-submodules https://github.com/zlwu92/gHyPart_TACO.git`
@@ -10,12 +10,17 @@ This is the source code for the original work "gHyPart: GPU-friendly End-to-End 
 
 `cmake .. -DCMAKE_BUILD_TYPE=RELEASE`
 
-`make bipart-cpu` and `make MtKaHyPar`
+`make bipart-cpu -j` and `make MtKaHyPar -j`
 
 # Build gHyPart
 Go to gHyPart's root dir.
 
 `mkdir build && cd build/ && cmake ..`
 
-`make`
+`make -j`
 
+# Run experiments
+Go to `scripts/` folder and use `python run-xxx.py` to run all experiments.
+
+# Plot figures in paper
+Go to `figure_plotting` folder and run all scripts, you can get the figures plotted in paper. 

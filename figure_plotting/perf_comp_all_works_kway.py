@@ -24,49 +24,11 @@ import datetime
 current_date = datetime.date.today()
 
 file = 'results/works_all_comp_3090_2024-01-08.csv'
-
-file1 = 'results/bipart_perf_xeon_4214R_24cores_t12.csv'
-
-file2 = 'results/mtkahypar_perf_xeon_4214R_24cores_t12.csv'
-
-file3 = 'results/bipart_perf_xeon_8358P_64cores_t64.csv'
-
-file4 = 'results/mtkahypar_perf_xeon_8358P_64cores_t64.csv'
-
-file5 = 'results/ghypart_perf_RTX3090.csv'
-
-file6 = 'results/benchmarks_all_patterns_real_hypergraphs_3090_2024-10-13.csv'
-
-file7 = 'results/ghypart_perf_RTX4090.csv'
-
-file8 = 'results/ghypart_perf_bingxing-cloud_RTX3090.csv'
-
-file9 = 'results/ghypart_perf_bingxing-cloud_RTX4090.csv'
-
-file10 = 'results/bipart_perf_xeon_4214R_24cores_t24.csv'
-
-# file11 = 'benchmarks_all_patterns_real_hypergraphs_liu3090_2024-10-20.csv'
-file11 = 'results/benchmarks_all_patterns_real_hypergraphs_liu3090_2024-10-20_new.csv'
-
 file12 = 'results/prof_hmetis_xeon_4214R_all.csv'
-
 file13 = 'results/ghypart_perf_RTX3090_2024-10-24.csv'
 file14 = 'results/bipart_perf_xeon_4214R_t12_2024-10-25.csv'
-# file13 = 'ghypart_perf_RTX3090_2024-10-29.csv' # high-quality policy
-# file14 = 'bipart_quality_results_2024-10-28.csv'
 file15 = 'results/mtkahypar_perf_xeon_4214R_24cores_t12_241020.csv'
 
-data1 = pd.read_csv(file1)
-data2 = pd.read_csv(file2)
-data3 = pd.read_csv(file3)
-data4 = pd.read_csv(file4)
-data5 = pd.read_csv(file5)
-data6 = pd.read_csv(file6)
-data7 = pd.read_csv(file7)
-data8 = pd.read_csv(file8)
-data9 = pd.read_csv(file9)
-data10 = pd.read_csv(file10)
-data11 = pd.read_csv(file11)
 data12 = pd.read_csv(file12)
 data13 = pd.read_csv(file13)
 data14 = pd.read_csv(file14)
@@ -198,7 +160,7 @@ def perf_comp_all_with_kway():
     plt.tight_layout()
 
     # output = f"work_perf_comp_all_{current_date}.pdf"
-    output = f"work_perf_comp_all_2024-10-25.pdf"
+    output = f"results/work_perf_comp_all_2024-10-25.pdf"
     # 保存图片
     plt.savefig(output, dpi=300, bbox_inches='tight')
 

@@ -25,39 +25,16 @@ import plot_perf_comparisons as ppc
 current_date = datetime.date.today()
 
 file = 'results/works_all_comp_3090_2024-01-08.csv'
-
-file1 = 'results/bipart_perf_xeon_4214R_24cores_t12.csv'
-
-file2 = 'results/bipart_perf_xeon_6348_56cores_t56.csv'
-
-file3 = 'results/mtkahypar_perf_xeon_4214R_24cores_t12.csv'
-
-file4 = 'results/mtkahypar_perf_xeon_8358P_64cores_t64.csv'
-
-# file5 = 'bipart_perf_xeon_6338_64cores_t64.csv'
-file5 = 'results/bipart_perf_xeon_8358P_64cores_t64.csv'
-
-file6 = 'results/ghypart_perf_RTX3090_2024-10-24.csv'
-file7 = 'results/bipart_perf_xeon_4214R_t12_2024-10-25.csv'
-file8 = 'results/mtkahypar_perf_xeon_4214R_24cores_t12_241020.csv'
 file9 = 'results/bipart_perf_xeon_13900K_t24_2024-10-25.csv'
-# file9 = 'bipart_perf_xeon_8255C_t32.csv'
 file10 = 'results/mtkahypar_perf_xeon_13900K_t24_direct_2024-10-25.csv'
 
 data = pd.read_csv(file)
-data1 = pd.read_csv(file6)
-data2 = pd.read_csv(file7)
-data3 = pd.read_csv(file8)
 data4 = pd.read_csv(file9) # bipart_perf_xeon_13900K_t24_2024-10-25.csv
 data5 = pd.read_csv(file10) # mtkahypar_perf_xeon_13900K_t24_direct_2024-10-25.csv
 
-# data_othercpu = pd.read_csv('bipart_perf_xeon_8255C_t32.csv')
-# data_othercpu = pd.read_csv('bipart_perf_xeon_6338_64cores_t28.csv')
-data_othercpu1 = pd.read_csv('bipart_perf_xeon_6348_56cores_t28.csv')
-data_othercpu2 = pd.read_csv('bipart_perf_xeon_8163_48cores_t24.csv')
-data_othercpu3 = pd.read_csv('bipart_perf_xeon_8358P_32cores_t32.csv')
-data_othercpu4 = pd.read_csv('mtkahypar_perf_xeon_8358P_64cores_t64.csv')
-data_othercpu5 = pd.read_csv('mtkahypar_perf_xeon_8358P_32cores1_t32.csv')
+data_othercpu3 = pd.read_csv('results/bipart_perf_xeon_8358P_32cores_t32.csv')
+data_othercpu4 = pd.read_csv('results/mtkahypar_perf_xeon_8358P_64cores_t64.csv')
+data_othercpu5 = pd.read_csv('results/mtkahypar_perf_xeon_8358P_32cores_t32.csv')
 
 colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", 
           "#800080", "#ffc0cb", "#ffa500", "#808080", 
@@ -83,10 +60,11 @@ def perf_comp_all_with_highend_cpu_new():
     y4 = merged_data['k=2_y'] # mt-kahypar-13900k
     y5 = merged_data['gHyPart']
     y6 = data_othercpu3['k=2']
-    y7 = data_othercpu4['k=2']
+    # y7 = data_othercpu4['k=2']
+    y7 = data_othercpu5['k=2']
     
     print(gmean(y1/y1), gmean(y1/y2), gmean(y1/y3), gmean(y1/y4), gmean(y1/y5))
-    print(gmean(y1/data_othercpu1['k=2']), gmean(y1/data_othercpu2['k=2']), gmean(y1/data_othercpu3['k=2']))
+    print(gmean(y1/data_othercpu3['k=2']))
     print(gmean(y1/data_othercpu4['k=2']))
     print(gmean(y1/data_othercpu5['k=2']))
 
@@ -161,7 +139,7 @@ def perf_comp_all_with_highend_cpu_new():
     # 调整布局以适应标签
     plt.tight_layout()
 
-    output = f'work_comp_all_with_highend_cpu_{current_date}.pdf'
+    output = f'results/work_comp_all_with_highend_cpu_{current_date}.pdf'
     # 保存图片
     plt.savefig(output, dpi=300, bbox_inches='tight')
 

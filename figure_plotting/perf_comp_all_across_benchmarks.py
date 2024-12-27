@@ -159,7 +159,7 @@ def perf_comp_all_across_benchmarks():
     # 调整布局以适应标签
     plt.tight_layout()
 
-    output = f"work_perf_comp_all_across_benchmarks_{current_date}.pdf"
+    output = f"results/work_perf_comp_all_across_benchmarks_{current_date}.pdf"
     # 保存图片
     plt.savefig(output, dpi=300, bbox_inches='tight')
 
