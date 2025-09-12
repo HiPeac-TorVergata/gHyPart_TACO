@@ -31,8 +31,8 @@ def prof_ghypart_results():
     # with open(edgecut_output, 'w') as out:
     #     out.write("dataset,part2_cut,part2_time,part3_cut,part3_time,part4_cut,part4_time\n")
     
-    # cmd = f"cd ../build_1024 && rm -rf * && cmake .. && make -j8 "
-    cmd = f"cd ../build_1024 && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
+    # cmd = f"cd ../build && rm -rf * && cmake .. && make -j8 "
+    cmd = f"cd ../build && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
     os.system(cmd)
     
     with open(perf_results, 'w') as out:
@@ -48,7 +48,7 @@ def prof_ghypart_results():
                 for n in nparts:
                     LOG = "run-ghypart.log"
                     file_path = input.os.path.join(input.dir_path, key)
-                    cmd = f"../build_1024/gHyPart "
+                    cmd = f"../build/gHyPart "
                     cmd += f"{file_path} "
                     cmd += f"-bp -wc 0 -useuvm 0 -sort_input 0 "
                     cmd += f"-useSelection 1 "
@@ -81,7 +81,7 @@ def prof_ghypart_results():
 perf_breakdown = f"../results/overP2/kernel_percentage_all_overP2_warmup.csv"
 
 def prof_ghypart_breakdown():
-    cmd = f"cd ../build_1024 && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
+    cmd = f"cd ../build && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
     os.system(cmd)
     
     # with open(perf_breakdown, 'w') as out:
@@ -96,7 +96,7 @@ def prof_ghypart_breakdown():
                 print(count, value)
                 LOG = "run-ghypart.log"
                 file_path = input.os.path.join(input.dir_path, key)
-                cmd = f"../build_1024/gHyPart "
+                cmd = f"../build/gHyPart "
                 cmd += f"{file_path} "
                 cmd += f"-bp -wc 0 -useuvm 0 -sort_input 0 "
                 cmd += f"-useSelection 1 "
@@ -129,7 +129,7 @@ def prof_ghypart_breakdown():
 
 
 def prof_ghypart_kernel_breakdown():
-    cmd = f"cd ../build_1024 && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
+    cmd = f"cd ../build && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
     os.system(cmd)
     
     with open(perf_breakdown, 'w') as out:
@@ -147,7 +147,7 @@ def prof_ghypart_kernel_breakdown():
             print(count, value)
             LOG = "run-ghypart.log"
             file_path = input.os.path.join(input.dir_path, key)
-            cmd = f"../build_1024/gHyPart "
+            cmd = f"../build/gHyPart "
             cmd += f"{file_path} "
             cmd += f"-bp -wc 0 -useuvm 0 -sort_input 0 "
             cmd += f"-usenewkernel12 0 -newParBaseK12 1 "
