@@ -9,7 +9,7 @@ current_date = datetime.date.today()
 nparts = [2, 3, 4]
 
 print(input.machine_name)
-perf_results = f'../results/bipart_{input.machine_name}_t{input.num_thread}_{current_date}.csv'
+perf_results = f'../results/hipeac_bipart_{input.machine_name}_t{input.num_thread}_{current_date}.csv'
 
 bipart_policy = ['RAND', 'PP', 'PLD', 'WD', 'MWD', 'DEG', 'MDEG']
 our_policy_list = ['-RAND', '-HDH', '-LDH', '-LSNWH', '-HSNWH', '-LRH', '-HRH']
