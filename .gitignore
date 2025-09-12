@@ -1,4 +1,7 @@
 benchmark_set/
 *.hgr
-script/out/
+scripts/__pycache__/
+scripts/out/
+*.part
+*.log
 results/hipeac*
