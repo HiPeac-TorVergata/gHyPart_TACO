@@ -8,18 +8,24 @@ import datetime
 current_date = datetime.date.today()
 nparts = [2, 3, 4]
 
-
-perf_results = '../results/bipart_perf_xeon_4214R_t12_{current_date}.csv'
+print(input.machine_name)
+perf_results = f'../results/bipart_{input.machine_name}_t{input.num_thread}_{current_date}.csv'
 
 bipart_policy = ['RAND', 'PP', 'PLD', 'WD', 'MWD', 'DEG', 'MDEG']
 our_policy_list = ['-RAND', '-HDH', '-LDH', '-LSNWH', '-HSNWH', '-LRH', '-HRH']
 
 def prof_bipart_results():
 
-    cmd = f"cd ../cpu_works/BiPart/build/lonestar/analytics/cpu/bipart/ && make bipart-cpu "
-    # cmd = f"cd ../cpu_works/BiPart/build_docker/lonestar/analytics/cpu/bipart/ && make bipart-cpu "
+    cmd = f"cd ../cpu_works/BiPart && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=RELEASE && make bipart-cpu -j"
     os.system(cmd)
-    
+    cmd = f"mkdir -p out"
+    os.system(cmd)
+    cmd = f"cd out && mkdir -p bipart"
+    os.system(cmd)
+    cmd = f"cd out/bipart && mkdir -p {current_date}"
+    os.system(cmd)
+
+
     # with open(perf_results, 'w') as out:
     #     out.write("id,dataset,k=2,k=3,k=4,\n")
     with open(perf_results, 'a') as out:
@@ -34,12 +40,14 @@ def prof_bipart_results():
                 print(count, value)
                 for n in nparts:
                     LOG1 = "run-bipart.log"
+                    output_file = f"out/bipart/{current_date}/{value}_{n}.part"
+                    print(output_file)
                     cmd = f"../cpu_works/BiPart/build/lonestar/analytics/cpu/bipart/bipart-cpu -hMetisGraph "
                     # cmd = f"../cpu_works/BiPart/build_docker/lonestar/analytics/cpu/bipart/bipart-cpu -hMetisGraph "
-                    cmd += f"{file_path} -t=12 "
+                    cmd += f"{file_path} -t={input.num_thread} "
                     # cmd += f"--PLD "
                     cmd += f"--numPartitions={n} "
-                    cmd += f"--output=1 > {LOG1}"
+                    cmd += f"--output=1 --outputFile={output_file} > {LOG1}"
                     print(cmd)
                     # os.system(cmd)
                     input.subprocess.call(cmd, shell=True)

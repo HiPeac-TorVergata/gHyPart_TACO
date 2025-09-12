@@ -26,7 +26,38 @@ import os
 # import seaborn as sns
 
 # dir_path = '/workspace/benchmark_set/'
-dir_path = '/home/wuzhenlin/workspace/benchmark_set/'
+dir_path = '../benchmark_set/'
+machine_name = "unknown"
+with open("/proc/cpuinfo") as f:
+    for line in f:
+        if "model name" in line:
+            print(line.strip())
+            machine_name = line.strip().split(":")[1].split("CPU @")[0].strip()
+            machine_name = machine_name.replace(" ","_").replace("(R)","").replace("(","").replace(")","")
+            break
+gpu_name = 'unknown'
+num_thread = os.cpu_count()
+
+try:
+    # Esegui il comando nvidia-smi e cattura l'output
+    result = subprocess.check_output(
+        ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+        encoding="utf-8"
+    )
+    gpus = [line.strip() for line in result.splitlines() if line.strip()]
+    if gpus:
+
+        for i, gpu in enumerate(gpus):
+            print(f"GPU {i}: {gpu}")
+            if i == 0:
+                gpu_name = gpu
+    else:
+       gpu_name = 'not_present'
+except FileNotFoundError:
+    gpu_name = 'not_present'
+
+
+
 
 input_map = {
       
