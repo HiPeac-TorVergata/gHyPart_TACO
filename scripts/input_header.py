@@ -51,6 +51,7 @@ try:
             print(f"GPU {i}: {gpu}")
             if i == 0:
                 gpu_name = gpu
+        gpu_name = gpu_name.replace(" ","_")
     else:
        gpu_name = 'not_present'
 except FileNotFoundError:

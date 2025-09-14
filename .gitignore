@@ -5,3 +5,4 @@ scripts/out/
 *.part
 *.log
 results/hipeac*
+build/

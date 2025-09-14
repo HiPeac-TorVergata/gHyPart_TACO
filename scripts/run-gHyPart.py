@@ -12,9 +12,7 @@ nparts = [2, 3, 4]
 edgecut_output = "../results/prof_ghypart_3090.csv"
 our_policy_list = ['-RAND', '-HDH', '-LDH', '-LSNWH', '-HSNWH', '-LRH', '-HRH']
 
-# perf_results = "../results/ghypart_perf_RTX3090.csv"
-perf_results = f"../results/ghypart_perf_RTX3090_{current_date}.csv"
-
+perf_results = f'../results/hipeac_ghypart_{input.gpu_name}_t{input.num_thread}_{current_date}.csv'
 
 ref_results = "../results/quality_comp_all_240112.csv"
 
@@ -28,13 +26,20 @@ gp_policy = data['policy1']
 
 
 def prof_ghypart_results():
+    cmd = f"mkdir -p ../build && cd ../build && cmake .. -DCMAKE_BUILD_TYPE=RELEASE && make -j"
+    os.system(cmd)
+    cmd = f"mkdir -p out"
+    os.system(cmd)
+    cmd = f"cd out && mkdir -p ghypart"
+    os.system(cmd)
+    cmd = f"cd out/ghypart && mkdir -p {current_date}"
+    os.system(cmd)
+
+
+
     # with open(edgecut_output, 'w') as out:
     #     out.write("dataset,part2_cut,part2_time,part3_cut,part3_time,part4_cut,part4_time\n")
-    
     # cmd = f"cd ../build && rm -rf * && cmake .. && make -j8 "
-    cmd = f"cd ../build && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
-    os.system(cmd)
-    
     with open(perf_results, 'w') as out:
         out.write("id,dataset,k=2,k=3,k=4,\n")
     with open(perf_results, 'a') as out:
