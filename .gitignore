@@ -4,5 +4,6 @@ scripts/__pycache__/
 scripts/out/
 *.part
 *.log
-results/hipeac*
 build/
+debug/
+.vscode/

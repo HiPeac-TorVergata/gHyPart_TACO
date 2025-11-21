@@ -12,9 +12,9 @@ enable_language(CUDA)
 set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
 
 set(
-    CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} "#-g -G -lineinfo" 
+    CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} "#-g -G -lineinfo"
     # -g -G -O3#
-    -O3 -lineinfo -fopenmp 
+    -O3 -lineinfo -fopenmp
     # -gencode=arch=compute_90, code=sm_90 --expt-extended-lambda
     # -arch=compute_86;-code=sm_86
     -gencode=arch=compute_86,code=sm_86
@@ -34,6 +34,9 @@ set(
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+
+
 
 include_directories(
     kernels/
