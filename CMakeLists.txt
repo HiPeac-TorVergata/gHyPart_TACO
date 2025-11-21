@@ -1,42 +1,51 @@
-cmake_minimum_required(VERSION 3.11)
-
-# project(gpuHgrPar)
-# find_package(CUDA QUIET REQUIRED)
+cmake_minimum_required(VERSION 3.18)  # modern CUDA arch detection needs ≥ 3.18
 project(gpuHgrPar LANGUAGES CXX CUDA)
+
+# -----------------------------
+#  Detect CUDA (stop if missing)
+# -----------------------------
+include(CheckLanguage)
+check_language(CUDA)
+
+if(NOT CMAKE_CUDA_COMPILER)
+    message(FATAL_ERROR "CUDA compiler not found! Install CUDA or check environment variables.")
+endif()
+
 enable_language(CUDA)
 
-# set(CMAKE_BUILD_TYPE "Debug")
-# set(CMAKE_CUDA_FLAGS_DEBUG "-g") # -G
-# set(CMAKE_CUDA_FLAGS "-G") # “-G”选项会生成带有调试信息的CUDA二进制文件
-# set(CMAKE_CUDA_FLAGS_DEBUG "-O0 -g -lineinfo")
-set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
-
-set(
-    CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} "#-g -G -lineinfo"
-    # -g -G -O3#
-    -O3 -lineinfo -fopenmp
-    # -gencode=arch=compute_90, code=sm_90 --expt-extended-lambda
-    # -arch=compute_86;-code=sm_86
-    -gencode=arch=compute_86,code=sm_86
+# --- Detect GPU compute capability using nvidia-smi ------------------------
+execute_process(
+    COMMAND nvidia-smi --query-gpu=compute_cap --format=csv,noheader
+    OUTPUT_VARIABLE GPU_COMPUTE_CAP_RAW
+    ERROR_VARIABLE GPU_SMI_ERROR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_STRIP_TRAILING_WHITESPACE
 )
 
-# set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}; --Wno-deprecated-gpu-targets")
-# set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3 -lineinfo -fopenmp -gencode arch=compute_86,code=sm_86") # --ptxas-options=-v for register and shared mem usage
-# set(CMAKE_CUDA_ARCHITECTURES 90)
+if(GPU_COMPUTE_CAP_RAW MATCHES "^[0-9]+\\.[0-9]+$")
+    string(REPLACE "." "" GPU_ARCH "${GPU_COMPUTE_CAP_RAW}")
+    message(STATUS "Detected compute capability: ${GPU_COMPUTE_CAP_RAW} → sm_${GPU_ARCH}")
+    set(CMAKE_CUDA_ARCHITECTURES ${GPU_ARCH})
+else()
+    message(WARNING
+        "Could not parse compute capability from nvidia-smi.\n"
+        "nvidia-smi error: ${GPU_SMI_ERROR}\n"
+        "Falling back to sm_86."
+    )
+    set(CMAKE_CUDA_ARCHITECTURES 86)
+endif()
+# ---------------------------------------------------------------------------
 
-# add_definitions(
-#     -Wno-unused-parameter # -Werror
-#     -w -fPIC
-# )
-# set(CMAKE_VERBOSE_MAKEFILE ON)
-# add_compile_options(-std=c++17)
-# set(CMAKE_CXX_FLAGS "-std=c++17" ${CMAKE_CXX_FLAGS})
+
+# -----------------------------
+#  Compilation flags
+# -----------------------------
+set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -O3 -lineinfo -fopenmp")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-
-
 
 include_directories(
     kernels/
@@ -48,6 +57,9 @@ include_directories(
     .
 )
 
+# -----------------------------
+#   Sources
+# -----------------------------
 set(GPU_HGR_PAR_SOURCE_FILES
     kernels/coarsening_kernels.cuh
     kernels/coarsening_kernels.cu
@@ -92,18 +104,6 @@ set(GPU_HGR_PAR_SOURCE_FILES
     no_uvm_impl/kway_partition_no_uvm.cu
     no_uvm_impl/kway_partition_no_uvm_kernels.cuh
 
-    # coarsening.cu
-    # construction.cu
-    # partitioning_base.cu
-    # partitioning_opt1.cu
-    # partitioning_opt2.cu
-    # refinement_base.cu
-    # refinement_opt1.cu
-    # refinement_opt2.cu
-    # refinement_opt3.cu
-    # refinement_opt4.cu
-    # projection.cu
-
     use_uvm_impl/coarsening.cu
     use_uvm_impl/construction.cu
     use_uvm_impl/partitioning_base.cu
@@ -119,32 +119,16 @@ set(GPU_HGR_PAR_SOURCE_FILES
     main.cu
 )
 
-file(GLOB SRC_FILES ./* kernels/* include/* utility/* no_uvm_impl/* no_uvm_impl/non-deterministic/* use_uvm_impl/*)
-
-# link_directories(
-#     /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++fs.a
-# )
-
-# cuda_add_executable(
-add_executable(
-    gHyPart
-    ${GPU_HGR_PAR_SOURCE_FILES}
-    # ${SRC_FILES}
-)
-
-# target_compile_options(gHyPart PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
-#                         --generate-line-info 
-#                         -gencode arch=compute_86,code=sm_86>
-#                         )
+# -----------------------------
+#   Executable
+# -----------------------------
+add_executable(gHyPart ${GPU_HGR_PAR_SOURCE_FILES})
 
 find_package(OpenMP REQUIRED)
-set_target_properties(
-    gHyPart PROPERTIES CUDA_ARCHITECTURES "86;86"
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED OFF
-    CXX_EXTENSIONS OFF
-)
-# -lcudadevrt 
+
 target_link_libraries(
-    gHyPart -lstdc++fs -lcusparse OpenMP::OpenMP_CXX
+    gHyPart
+    -lstdc++fs
+    -lcusparse
+    OpenMP::OpenMP_CXX
 )
