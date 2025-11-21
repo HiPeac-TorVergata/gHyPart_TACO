@@ -67,6 +67,7 @@ def prof_ghypart_results():
                     input.subprocess.call(cmd, shell=True)
                     
                     with open(f'{LOG}', 'r') as file:
+                        ghypart = 0.0
                         for line in file:
                             # 使用正则表达式匹配包含特定文本格式的行
                             match = re.search(r'Total k-way partition time \(s\): (\d+\.\d+)', line)
