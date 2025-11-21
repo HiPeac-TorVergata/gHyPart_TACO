@@ -3,20 +3,27 @@ import time
 import pandas as pd
 import os
 import re
+import datetime
 
 nparts = [2, 3, 4]
+current_date = datetime.date.today()
 
-# edgecut_output = "../results/mtkahypar_quality_xeon_4214R.csv"
+
 edgecut_output = "../results/mtkahypar_all_quality_xeon_4214R.csv"
 
-perf_results = "../results/mtkahypar_perf_xeon_4214R_24cores_t12_direct.csv"
-# perf_results = "../results/taco_revision/mtkahypar_perf_xeon_4214R_24cores_t12_recursive.csv"
+print(input.machine_name)
+perf_results = f"../results/hipeac_mtkahypar_{input.machine_name}_t{input.num_thread}_{current_date}.csv"
 
 
 def prof_mtkahypar_results():
 
-    # cmd = f"cd ../cpu_works/Mt-KaHyPar-SDet/build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Release .. && make MtKaHyPar -j "
     cmd = f"cd ../cpu_works/Mt-KaHyPar-SDet/build && make MtKaHyPar -j "
+    os.system(cmd)
+    cmd = f"mkdir -p out"
+    os.system(cmd)
+    cmd = f"cd out && mkdir -p mtkahypar"
+    os.system(cmd)
+    cmd = f"cd out/mtkahypar && mkdir -p {current_date}"
     os.system(cmd)
     
     # with open(perf_results, 'w') as out:
@@ -33,12 +40,14 @@ def prof_mtkahypar_results():
                 print(count, value)
                 for n in nparts:
                     LOG1 = "run-mtkahypar.log"
+                    output_folder = f"out/mtkahypar/{current_date}"
+                    print(output_folder)
                     cmd = f"../cpu_works/Mt-KaHyPar-SDet/build/mt-kahypar/application/MtKaHyPar -h "
                     cmd += f"{file_path} "
                     cmd += f"-p ../cpu_works/Mt-KaHyPar-SDet/config/deterministic_preset.ini "
                     cmd += f"--instance-type=hypergraph "
                     cmd += f"-k {n} "
-                    cmd += f"-e 0.05 -o cut -m direct -t 12 > {LOG1}"
+                    cmd += f"-e 0.05 -o cut -m direct -t 12 --write-partition-file=true --partition-output-folder={output_folder} > {LOG1}"
                     print(cmd)
                     # os.system(cmd)
                     input.subprocess.call(cmd, shell=True)
@@ -123,7 +132,7 @@ def prof_mtkahypar_quality_results():
 if __name__ == '__main__':
     
     start_time = time.time()
-    # prof_mtkahypar_results()
-    prof_mtkahypar_quality_results()
+    prof_mtkahypar_results()
+    # prof_mtkahypar_quality_results()
     elapsed_time = time.time() - start_time  
     print(f"time: {elapsed_time} s, {elapsed_time / 3600} h")
