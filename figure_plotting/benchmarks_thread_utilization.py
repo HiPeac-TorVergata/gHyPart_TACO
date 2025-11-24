@@ -83,7 +83,7 @@ ax.tick_params(axis='y', which='major', labelsize=60)
 ax.set_xlabel('Evaluated Hypergraphs', va='center', fontsize=60, fontweight='bold', labelpad=40)
 
 ax.set_xlim(0, len(x)+10)
-ax.xaxis.set_ticks([0, 25, 50, 75, len(x)-2], fontsize=40)
+ax.xaxis.set_ticks([0, 25, 50, 75, len(x)-2]) #, fontsize=40)
 ax.tick_params(axis='x', which='major', labelsize=60, rotation=0)
 # dot1 = ax.plot(index_list[:-1], y[:-1], marker='o', markersize=10, linestyle='-', label='', color="black", alpha=.8, linewidth=5)
 

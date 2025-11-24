@@ -102,7 +102,7 @@ ax.set_ylim(0.01, 1e2)
 # ax.set_xlabel('Node Merging (Top 100)', va='center', fontsize=30, fontweight='bold', labelpad=30)
 ax.set_xlabel('Hypergraphs', va='center', fontsize=50, fontweight='bold', labelpad=30)
 ax.set_xlim(0, len(self_speedup))
-ax.xaxis.set_ticks([0, 100, 200, 300, 400, 499], fontsize=40)
+ax.xaxis.set_ticks([0, 100, 200, 300, 400, 499]) #, fontsize=40)
 ax.tick_params(axis='x', which='major', labelsize=40, rotation=0)
 
 cmap = plt.cm.Blues
