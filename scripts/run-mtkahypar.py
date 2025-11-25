@@ -9,7 +9,7 @@ nparts = [2, 3, 4]
 current_date = datetime.date.today()
 
 
-edgecut_output = "../results/mtkahypar_all_quality_xeon_4214R.csv"
+edgecut_output = f"../results/hipeac_mtkahypar_quality_{input.machine_name}_t{input.num_thread}_{current_date}.csv"
 
 print(input.machine_name)
 perf_results = f"../results/hipeac_mtkahypar_{input.machine_name}_t{input.num_thread}_{current_date}.csv"
@@ -84,18 +84,14 @@ def prof_mtkahypar_quality_results():
     cmd = f"cd ../cpu_works/Mt-KaHyPar-SDet/build && make MtKaHyPar -j "
     os.system(cmd)
     
-    # with open(edgecut_output, 'w') as out:
-    #     out.write("id,dataset,part2_cut,part2_time,part3_cut,part3_time,part4_cut,part4_time\n")
+    with open(edgecut_output, 'w') as out:
+        out.write("id,dataset,k=2,k=3,k=4\n")
         
     with open(edgecut_output, 'a') as out:
         count = 0
         for key, value in input.input_map.items():
             file_path = input.os.path.join(input.dir_path, key)
-            # if value == "G67":
             if count >= 0:
-            # if value == "tran5":
-            # if count >= 462 and count <= 480:
-            # if "ibm" in value or "dac" in value:
                 out.write(str(count)+","+value+",")
                 print(count, value)
                 for n in nparts:
@@ -123,7 +119,7 @@ def prof_mtkahypar_quality_results():
                                 
                     result2 = '{:.3f}'.format(input.math.fsum(time))
                     print(f"n={n}, cut={cut}, time={result2}")
-                    out.write(f"{cut[0]},{result2},")
+                    out.write(f"{cut[0]},")
                     out.flush()
                 out.write("\n")
             count += 1
@@ -132,7 +128,7 @@ def prof_mtkahypar_quality_results():
 if __name__ == '__main__':
     
     start_time = time.time()
-    prof_mtkahypar_results()
-    # prof_mtkahypar_quality_results()
+    # prof_mtkahypar_results()
+    prof_mtkahypar_quality_results()
     elapsed_time = time.time() - start_time  
     print(f"time: {elapsed_time} s, {elapsed_time / 3600} h")
