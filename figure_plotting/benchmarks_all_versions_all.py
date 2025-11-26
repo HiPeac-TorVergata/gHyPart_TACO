@@ -147,7 +147,7 @@ y3 = sorted_data['BiPart'] / sorted_data['gHyPart']
 ylim = 1e3
 ax.set_yscale('log', base=10)  # 设置纵坐标为log2刻度
 ax.set_ylim(0, ylim)  # 设置纵坐标起始值为0
-ax.yaxis.set_ticks([0.1, 1, 10, 100, 1000], fontsize=40)  # 设置刻度值
+ax.yaxis.set_ticks([0.1, 1, 10, 100, 1000]) #, fontsize=40)  # 设置刻度值
 ax.tick_params(axis='y', which='major', labelsize=40)
 ax.set_ylabel('Speedup over BiPart', va='center', fontsize=45, fontweight='bold', labelpad=45)  # 设置纵坐标title
 ax.set_xlabel('Hypergraphs', va='center', fontsize=45, fontweight='bold', labelpad=40)
@@ -155,7 +155,7 @@ ax.set_xlabel('Hypergraphs', va='center', fontsize=45, fontweight='bold', labelp
 print(len(x))
 xlim = 730
 ax.set_xlim(0, xlim)
-ax.xaxis.set_ticks([0, 250, len(x)-1], fontsize=40)
+ax.xaxis.set_ticks([0, 250, len(x)-1]) #, fontsize=40)
 ax.set_xticks([0, 250, len(x)-1])
 ax.tick_params(axis='x', which='major', labelsize=40, rotation=0)
 dot1 = ax.plot(index_list, y1, marker='+', linestyle='-', label='BiPart', color="#808080", linewidth=2)
@@ -186,7 +186,7 @@ print(xticks)
 xticklabels = list(ax.get_xticks()) + ['GMean']
 print(xticklabels)
 # ax.set_xticks(xticks)
-ax.xaxis.set_ticks(xticks, fontsize=40)
+ax.xaxis.set_ticks(xticks) #, fontsize=40)
 ax.set_xticklabels(xticklabels)
 
 xtick_labels = ax.get_xticklabels()

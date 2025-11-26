@@ -114,7 +114,7 @@ ax.set_xlim(0,len(x)+12)
 # ax.set_xticks(ticks=app_ticks, rotation=45, fontsize=30, labels=x, fontweight='bold')
 # ax.xaxis.set_ticks([0, 100, 200, 300, 400, len(x)-2], fontsize=40)
 # ax.xaxis.set_ticks([0, 10, 20, 30, 40, 50, 60, powerlaw-1], fontsize=40)
-ax.xaxis.set_ticks([0, 20, 40, 60, 80, topk-1], fontsize=40)
+ax.xaxis.set_ticks([0, 20, 40, 60, 80, topk-1]) #, fontsize=40)
 # ax.xaxis.set_ticks([0, 50, 100, filter-1], fontsize=40)
 ax.tick_params(axis='x', which='major', labelsize=50, rotation=0)
 # ax.plot(x[:-1], y1[:-1], marker='o', linestyle='-', label='Speedup for gHyPart', color="black")
@@ -211,9 +211,10 @@ last_value1 = y1.iloc[-1]
 # ax.text(bar1_pos, last_value1 + 5, "ɢHʏPᴀʀᴛ:[{:.2f}]".format(last_value1), color='black', ha='center', fontsize=30, rotation=90)
 # ax.text(bar2_pos, last_value2 + 5, "ɢHʏPᴀʀᴛ-O:[{:.2f}]".format(last_value2), color='red', ha='center', fontsize=30, rotation=90)
 
-ax.text(len(x) + 6.5, last_value1 + 1, "{:.2f}".format(last_value1), color='black', ha='center', fontsize=40, rotation=0)
+ax.text(len(x) + 6.5, last_value1 + 1, "{:.2f}".format(last_value1), color='black', ha='center',rotation=0)
+        #fontsize=40, rotation=0)
 
-ax.text(len(x)-3, max(y1[:-1])+50, "{:.2f}".format(max(y1[:-1])), color='black', ha='center', fontsize=40, rotation=0)
+ax.text(len(x)-3, max(y1[:-1])+50, "{:.2f}".format(max(y1[:-1])), color='black', ha='center', rotation=0)
 
 print(last_value1)
 # ax.text(bar1_pos + 7, 0.5, "{:.1%}".format(last_value1), color='black', ha='center', fontsize=40, rotation=90)
