@@ -62,7 +62,7 @@ def prof_hmetis_results():
                         # print(text)
                         with open(LOG, "w") as log:
                             result = input.subprocess.run(shlex.split(cmd), stdout=log, 
-                                                    stderr=input.subprocess.PIPE, timeout=timeout, check=True)
+                                                    stderr=input.subprocess.PIPE, check=True)
                             # print("result.returncode: ", result.returncode)
                             # if result.returncode != 0:
                             #     print("result.stderr: ", result.stderr.decode("utf-8"))
@@ -82,10 +82,19 @@ def prof_hmetis_results():
                             partitioning_time = float(match.group(1))
                             print(f"partitioning_time: {partitioning_time}")
                         # 将所有找到的 average 值转换为浮点数并求和
+                        print(average_values)
                         total_average = sum(float(value) for value in average_values)
                         
+                        match = re.search(r"Hyperedge Cut:\s+(\d+)", text)
+                        if match:
+                            hyperedge_cut = int(match.group(1))
+                            print("Hyperedge Cut =", hyperedge_cut)
+                        else:
+                            print("Valore non trovato")  
+                        # 将所有找到的 average 值转换为浮点数并求和
+                         
                         print(f"total_average: {total_average}")
-                        out.write(f"{total_average},{partitioning_time},")
+                        out.write(f"{hyperedge_cut},{partitioning_time},")
 
                     except input.subprocess.TimeoutExpired:
                         print("Process timed out")
@@ -95,6 +104,7 @@ def prof_hmetis_results():
                         if "Signals.SIGSEGV" in str(e):
                             print("Segmentation fault occurred in the external program!")
                             out.write(f"segfault,{timeout},")
+                        print("eccezzione")
                     out.flush()
                 out.write("\n")
             count += 1
