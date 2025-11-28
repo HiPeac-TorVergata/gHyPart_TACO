@@ -176,39 +176,60 @@ def plot_box_standard_detailed(all_df: pd.DataFrame, out_pdf: Path, reference: s
         'hmetis': 'hMetis'
     }
 
+    # seleziona il riferimento
     ref = all_df[all_df['source'] == reference][['dataset','k','cut']].rename(columns={'cut':'cut_ref'})
     merged = all_df.merge(ref, on=['dataset','k'], how='left', validate='many_to_one')
     merged['metric_diff'] = (merged['cut'] - merged['cut_ref']) / merged['hedges_global']
     merged = merged[merged['source'] != reference]
     merged = merged.dropna(subset=['metric_diff'])
 
+    # etichette originali
     merged['label'] = merged['source'] + '_k' + merged['k'].astype(int).astype(str)
-    labels = sorted(merged['label'].unique())
+    labels = sorted(merged['label'].unique(), key=lambda x: (x.split('_k')[0], int(x.split('_k')[1])))
     groups = [merged[merged['label'] == lab]['metric_diff'].values for lab in labels]
 
-    formatted_labels = []
-    for lab in labels:
-        source, k = lab.split('_k')
-        formatted_labels.append(f"{name_mapping.get(source, source)} (k={k})")
+    # etichette formattate
+    formatted_labels = [f"{name_mapping.get(lab.split('_k')[0], lab.split('_k')[0])} (k={lab.split('_k')[1]})"
+                        for lab in labels]
 
-    fig, ax = plt.subplots(figsize=(14, 7))
+    # imposta parametri globali font come nel tuo script di riferimento
+    plt.rcParams['font.weight'] = 'bold'
+    plt.rcParams['axes.labelweight'] = 'bold'
+    plt.rcParams['legend.fontsize'] = 32
+    plt.rcParams['legend.frameon'] = True
+
+    fig, ax = plt.subplots(figsize=(30, 11))  # figura ampia come nello script di riferimento
     plt.style.use('seaborn-v0_8-whitegrid')
+
+    # boxplot
     bp = ax.boxplot(groups,
                     patch_artist=True,
                     showfliers=False,
                     widths=0.6,
                     boxprops=dict(facecolor='skyblue', edgecolor='black', alpha=0.7),
-                    whiskerprops=dict(color='black', linewidth=1.2),
-                    capprops=dict(color='black', linewidth=1.2),
-                    medianprops=dict(color='darkblue', linewidth=2),
+                    whiskerprops=dict(color='black', linewidth=3),
+                    capprops=dict(color='black', linewidth=3),
+                    medianprops=dict(color='darkblue', linewidth=3),
                     meanprops=dict(marker='D', markeredgecolor='black', markerfacecolor='red'),
                     showmeans=True)
 
-    ax.set_xticklabels(formatted_labels, rotation=45, ha='right')
-    ax.set_ylabel("Partitioning Quality Difference")
+    ax.set_xticklabels(formatted_labels, rotation=45, ha='center', fontsize=50)
+    ax.set_ylabel("Partitioning Quality Difference", fontsize=40, fontweight='bold', labelpad=45)
+    ax.tick_params(axis='y', which='major', labelsize=30)
+    ax.tick_params(axis='x', which='major', labelsize=30)
+
+
+    # spessori dei bordi
+    spines = ax.spines
+    spines['top'].set_linewidth(5)
+    spines['bottom'].set_linewidth(5)
+    spines['left'].set_linewidth(5)
+    spines['right'].set_linewidth(5)
+
     plt.tight_layout()
-    plt.savefig(out_pdf, dpi=300)
+    plt.savefig(out_pdf, dpi=300, bbox_inches='tight')
     print(f"Saved styled box plot to {out_pdf}")
+
 
 
 
