@@ -23,16 +23,12 @@ import datetime
 
 current_date = datetime.date.today()
 
-file1 = '../results/hipeac_bipart_Intel_CoreTM_i7-6700_t8_2025-09-14.csv'
-#file1 = 'results/bipart_perf_xeon_4214R_24cores_t12.csv'
-file2 = '../results/hipeac_mtkahypar_Intel_Xeon_CPU_E5-2683_v3_@_2.00GHz_t56_2025-09-19.csv'
-file3 = '../results/hipeac_ghypart_NVIDIA_GeForce_RTX_4090_t32_2025-09-14.csv'
+#file1 = '../results/hipeac_bipart_Intel_CoreTM_i7-6700_t8_2025-09-14.csv'
+file1 = 'results/bipart_perf_xeon_4214R_24cores_t12.csv'
+#file2 = '../results/hipeac_mtkahypar_Intel_Xeon_CPU_E5-2683_v3_@_2.00GHz_t56_2025-09-19.csv'
+file2 = 'results/mtkahypar_perf_xeon_4214R_24cores_t12.csv'
 file4 = 'results/prof_hmetis_xeon_4214R_all.csv'
 
-data1 = pd.read_csv(file1)
-data2 = pd.read_csv(file2)
-data3 = pd.read_csv(file3)
-data4 = pd.read_csv(file4)
 
 
 
@@ -45,24 +41,42 @@ colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00",
           "#CC99FF", "#FFCC99", "#99CCFF", "#CCFF99",]
 
 
-def perf_comp_all_with_2way(k):
+def perf_comp_all_with_2way(k,gpu):
+    if gpu == "1060":
+        file3 = '../results/hipeac_ghypart_NVIDIA_GeForce_GTX_1060_3GB_t8_2025-11-22.csv'
+    if gpu == "2070":
+        file3 = '../results/hipeac_ghypart_NVIDIA_GeForce_RTX_2070_t12_2025-11-21.csv'
+    if gpu == "q5000":
+        file3 = '../results/hipeac_ghypart_QUADRO_RTX_5000_2025-11-22.csv'
+    if gpu == "4090":
+        file3 = '../results/hipeac_ghypart_NVIDIA_GeForce_RTX_4090_t32_2025-09-14.csv'
+    data1 = pd.read_csv(file1)
+    data2 = pd.read_csv(file2)
+    data3 = pd.read_csv(file3)
+    data4 = pd.read_csv(file4)
+
     data1['BiPart']=data1['k=2']
     data2['Mt-KaHyPar-SDet']=data2['k=2']
     data3['gHyPart']=data3['k=2']
     data4['part2_time']
     merged_data = pd.concat([data1['BiPart'],data2['Mt-KaHyPar-SDet'],data3['gHyPart'], data4['part2_time']], axis=1)
     print(merged_data)
+    merged_data = merged_data[merged_data['gHyPart']!= 0.0]
+    print(merged_data)
+    
     #return
     merged_data['g_ratio'] = merged_data['BiPart'] / merged_data['gHyPart'] # merged_data['best']
     merged_data = merged_data.sort_values(by='g_ratio')
-    y1 = merged_data['BiPart'][:-1]
-    y6 = merged_data['part2_time'][:-1]
-    y2 = merged_data['Mt-KaHyPar-SDet'][:-1]
+    y1 = merged_data['BiPart']
+    y6 = merged_data['part2_time']
+    y2 = merged_data['Mt-KaHyPar-SDet']
     #y3 = merged_data['gHyPart-B'][:-1]
-    y4 = merged_data['gHyPart'][:-1]
+    y4 = merged_data['gHyPart']
     #y5 = merged_data['best'][:-1]
     
-    x = merged_data.iloc[:-1,0]
+    print (y1.sort_index(),y2.sort_index(),y6.sort_index(),y4.sort_index())
+    x = merged_data
+
     index_list = range(len(x))
     print(merged_data, index_list)
     
@@ -75,7 +89,7 @@ def perf_comp_all_with_2way(k):
     ylim = 100
     ax.set_yscale('log', base=10)  # 设置纵坐标为log2刻度
     ax.set_ylim(0, ylim)  # 设置纵坐标起始值为0
-    ax.yaxis.set_ticks([0.1, 1, 10, 100, 1000, ylim])  # 设置刻度值
+    #ax.yaxis.set_ticks([0.1, 1, 10, ylim])  # 设置刻度值
     # ax.yaxis.set_ticks([0.1, 1, 10, ylim])  # 设置刻度值
     ax.tick_params(axis='y', which='major', labelsize=48)
     ax.set_ylabel('Speedup over BiPart', va='center', fontsize=60, fontweight='bold', labelpad=45)  # 设置纵坐标title
@@ -161,7 +175,16 @@ def perf_comp_all_with_2way(k):
 
     # output = f"work_comp_all_{k}way_using_4214R_cpu_and_3090_gpu_{current_date}.pdf"
     # output = f"work_comp_all_{k}way_using_4214R_cpu_and_4090_gpu_{current_date}.pdf"
-    output = f'results/work_comp_all_2way_using_4214R_cpu_and_3090_gpu_2024-10-25.pdf'
+    if gpu == "p100":
+        output = f'results/hipeac_figure_11_tesla_p100.pdf'
+    if gpu == "1060":
+        output = f'results/hipeac_figure_11_gtx_1060.pdf'
+    if gpu == "2070":
+        output = f'results/hipeac_figure_11_rtx_2070.pdf'
+    if gpu == "4090":
+        output = f'results/hipeac_figure_11_rtx_4090.pdf'
+    if gpu == "q5000":    
+        output = f'results/hipeac_figure_11_tesla_RTX_quadro5000.pdf'
 
     # 保存图片
     plt.savefig(output, dpi=300, bbox_inches='tight')
@@ -172,5 +195,7 @@ def perf_comp_all_with_2way(k):
 
 
 if __name__ == '__main__':
-    perf_comp_all_with_2way(2)
+    gpus=["1060","2070","4090","q5000"]
+    for i in gpus:
+        perf_comp_all_with_2way(2,i)
     
