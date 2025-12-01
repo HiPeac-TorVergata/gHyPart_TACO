@@ -3,27 +3,20 @@ import time
 import pandas as pd
 import os
 import re
-import datetime
 
 nparts = [2, 3, 4]
-current_date = datetime.date.today()
 
+# edgecut_output = "../results/mtkahypar_quality_xeon_4214R.csv"
+edgecut_output = "../results/mtkahypar_all_quality_xeon_4214R.csv"
 
-edgecut_output = f"../results/hipeac_mtkahypar_quality_{input.machine_name}_t{input.num_thread}_{current_date}.csv"
-
-print(input.machine_name)
-perf_results = f"../results/hipeac_mtkahypar_{input.machine_name}_t{input.num_thread}_{current_date}.csv"
+perf_results = "../results/mtkahypar_perf_xeon_4214R_24cores_t12_direct.csv"
+# perf_results = "../results/taco_revision/mtkahypar_perf_xeon_4214R_24cores_t12_recursive.csv"
 
 
 def prof_mtkahypar_results():
 
+    # cmd = f"cd ../cpu_works/Mt-KaHyPar-SDet/build && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Release .. && make MtKaHyPar -j "
     cmd = f"cd ../cpu_works/Mt-KaHyPar-SDet/build && make MtKaHyPar -j "
-    os.system(cmd)
-    cmd = f"mkdir -p out"
-    os.system(cmd)
-    cmd = f"cd out && mkdir -p mtkahypar"
-    os.system(cmd)
-    cmd = f"cd out/mtkahypar && mkdir -p {current_date}"
     os.system(cmd)
     
     # with open(perf_results, 'w') as out:
@@ -40,14 +33,12 @@ def prof_mtkahypar_results():
                 print(count, value)
                 for n in nparts:
                     LOG1 = "run-mtkahypar.log"
-                    output_folder = f"out/mtkahypar/{current_date}"
-                    print(output_folder)
                     cmd = f"../cpu_works/Mt-KaHyPar-SDet/build/mt-kahypar/application/MtKaHyPar -h "
                     cmd += f"{file_path} "
                     cmd += f"-p ../cpu_works/Mt-KaHyPar-SDet/config/deterministic_preset.ini "
                     cmd += f"--instance-type=hypergraph "
                     cmd += f"-k {n} "
-                    cmd += f"-e 0.05 -o cut -m direct -t 12 --write-partition-file=true --partition-output-folder={output_folder} > {LOG1}"
+                    cmd += f"-e 0.05 -o cut -m direct -t 12 > {LOG1}"
                     print(cmd)
                     # os.system(cmd)
                     input.subprocess.call(cmd, shell=True)
@@ -84,14 +75,18 @@ def prof_mtkahypar_quality_results():
     cmd = f"cd ../cpu_works/Mt-KaHyPar-SDet/build && make MtKaHyPar -j "
     os.system(cmd)
     
-    with open(edgecut_output, 'w') as out:
-        out.write("id,dataset,k=2,k=3,k=4\n")
+    # with open(edgecut_output, 'w') as out:
+    #     out.write("id,dataset,part2_cut,part2_time,part3_cut,part3_time,part4_cut,part4_time\n")
         
     with open(edgecut_output, 'a') as out:
         count = 0
         for key, value in input.input_map.items():
             file_path = input.os.path.join(input.dir_path, key)
+            # if value == "G67":
             if count >= 0:
+            # if value == "tran5":
+            # if count >= 462 and count <= 480:
+            # if "ibm" in value or "dac" in value:
                 out.write(str(count)+","+value+",")
                 print(count, value)
                 for n in nparts:
@@ -119,7 +114,7 @@ def prof_mtkahypar_quality_results():
                                 
                     result2 = '{:.3f}'.format(input.math.fsum(time))
                     print(f"n={n}, cut={cut}, time={result2}")
-                    out.write(f"{cut[0]},")
+                    out.write(f"{cut[0]},{result2},")
                     out.flush()
                 out.write("\n")
             count += 1

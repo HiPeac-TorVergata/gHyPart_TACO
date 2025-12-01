@@ -1,46 +1,70 @@
-import csv
-import random
 import matplotlib.pyplot as plt
-import numpy as np
-import sys
 import os
 import pandas as pd
-# sys.path.append(".")
-# import myplot
 import matplotlib
 import os
 if os.environ.get('DISPLAY', '') == '':
     matplotlib.use('Agg')
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import MultipleLocator
-from matplotlib.ticker import ScalarFormatter
-from matplotlib.ticker import FuncFormatter
-from matplotlib.font_manager import FontProperties
-import seaborn as sns
 from scipy.stats import gmean
 import datetime
+import subprocess
 
 current_date = datetime.date.today()
 
-file = 'results/works_all_comp_3090_2024-01-08.csv'
-file12 = 'results/prof_hmetis_xeon_4214R_all.csv'
-file13 = '../results/hipeac_ghypart_NVIDIA_GeForce_RTX_4090_t32_2025-09-14.csv'
-file14 = 'results/bipart_perf_xeon_4214R_t12_2024-10-25.csv'
-file15 = 'results/mtkahypar_perf_xeon_4214R_24cores_t12_241020.csv'
+
+cpu_name = "unknown"
+gpu_name = "unknown"
+
+# -------------------------------------------------------------------------
+# Detect CPU model name
+# -------------------------------------------------------------------------
+with open("/proc/cpuinfo") as f:
+    for line in f:
+        if "model name" in line:
+            print(line.strip())
+            cpu_name = line.strip().split(":")[1].split("CPU @")[0].strip()
+            cpu_name = cpu_name.replace(" ","_").replace("(R)","").replace("(","").replace(")","")
+            break
+
+
+# -------------------------------------------------------------------------
+# Detect GPU model name using nvidia-smi command. Note this could not work
+# inside HPC context where modules environment doesn't let users use 
+# nvidia-smi.
+# -------------------------------------------------------------------------
+try:
+    result = subprocess.check_output(
+        ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+        encoding="utf-8"
+    )
+    gpus = [line.strip() for line in result.splitlines() if line.strip()]
+    if gpus:
+
+        for i, gpu in enumerate(gpus):
+            print(f"GPU {i}: {gpu}")
+            if i == 0:
+                gpu_name = gpu
+        gpu_name = gpu_name.replace(" ","_")
+    else:
+       gpu_name = 'not_present'
+except FileNotFoundError:
+    gpu_name = 'not_present'
+
+
+
+
+file = '../figure_plotting/results/works_all_comp_3090_2024-01-08.csv'
+file12 = '../figure_plotting/results/prof_hmetis_xeon_4214R_all.csv'
+file13 = '../hipeac_results/hipeac_ghypart_NVIDIA_GeForce_RTX_4090_t32_2025-09-14.csv'
+file14 = '../figure_plotting/results/bipart_perf_xeon_4214R_t12_2024-10-25.csv'
+file15 = '../figure_plotting/results/mtkahypar_perf_xeon_4214R_24cores_t12_241020.csv'
 
 data12 = pd.read_csv(file12)
 data13 = pd.read_csv(file13)
 data14 = pd.read_csv(file14)
 data15 = pd.read_csv(file15)
 
-# data = pd.read_csv(file)
-# bipart_column = data.iloc[:-1, 1] # bipart
-# mtkaypar_column = data.iloc[:-1,3] # mtkahypar
-# ghypart_column = data.iloc[:-1,5] # gHyPart
-# gpubase_column = data.iloc[:-1,4] # gHyPart-B
-# print(bipart_column, mtkaypar_column, ghypart_column)
-# print(bipart_column)
 
 colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", 
           "#800080", "#ffc0cb", "#ffa500", "#808080", 
@@ -72,12 +96,11 @@ def perf_comp_all_with_kway():
 
     fig, ax = plt.subplots(figsize=(25, 11))
     ylim = 100
-    ax.set_yscale('log', base=10)  # 设置纵坐标为log2刻度
-    ax.set_ylim(0, ylim)  # 设置纵坐标起始值为0
-    ax.yaxis.set_ticks([0.1, 1, 10, ylim])  # 设置刻度值
-    # ax.yaxis.set_ticks([0.1, 1, 10, ylim])  # 设置刻度值
+    ax.set_yscale('log', base=10)  
+    ax.set_ylim(0, ylim)  
+    ax.yaxis.set_ticks([0.1, 1, 10, ylim])  
     ax.tick_params(axis='y', which='major', labelsize=48)
-    ax.set_ylabel('Speedup over BiPart', va='center', fontsize=50, fontweight='bold', labelpad=45)  # 设置纵坐标title
+    ax.set_ylabel('Speedup over BiPart', va='center', fontsize=50, fontweight='bold', labelpad=45)  
     ax.set_xlabel('', va='center', fontsize=40, fontweight='bold', labelpad=40)
     
     ax.set_xlim(0, 10)
@@ -153,15 +176,11 @@ def perf_comp_all_with_kway():
     spines['left'].set_linewidth(5)
     spines['right'].set_linewidth(5)
 
-    # 调整布局以适应标签
     plt.tight_layout()
 
-    # output = f"work_perf_comp_all_{current_date}.pdf"
-    output = f"results/work_perf_comp_all_rtx_4090.pdf"
-    # 保存图片
+    output = f"figures/work_perf_comp_all_{gpu_name}_{current_date}.pdf"
     plt.savefig(output, dpi=300, bbox_inches='tight')
 
-    # 显示图形  
     plt.show()
     
 if __name__ == '__main__':

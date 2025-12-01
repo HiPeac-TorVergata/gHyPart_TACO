@@ -1,34 +1,63 @@
-import csv
-import random
+#!/usr/bin/env python3
+# -------------------------------------------------------------------------
+# This is the Tor Vergata team version of hipeac_comp_all_gpu.py used for the 
+# reproducibility study of gHyPart for HiPEAC Students Challenge 2025.
+#
+# There is no original code in author's work similar to this script
+# -------------------------------------------------------------------------
 import matplotlib.pyplot as plt
-import numpy as np
-import sys
 import os
 import pandas as pd
-# sys.path.append(".")
-# import myplot
 import matplotlib
-import os
 if os.environ.get('DISPLAY', '') == '':
     matplotlib.use('Agg')
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import MultipleLocator
-from matplotlib.ticker import ScalarFormatter
-from matplotlib.ticker import FuncFormatter
-from matplotlib.font_manager import FontProperties
-import seaborn as sns
 from scipy.stats import gmean
 import datetime
+import subprocess
+
+cpu_name = "unknown"
+gpu_name = "unknown"
+
+# -------------------------------------------------------------------------
+# Detect CPU model name
+# -------------------------------------------------------------------------
+with open("/proc/cpuinfo") as f:
+    for line in f:
+        if "model name" in line:
+            print(line.strip())
+            cpu_name = line.strip().split(":")[1].split("CPU @")[0].strip()
+            cpu_name = cpu_name.replace(" ","_").replace("(R)","").replace("(","").replace(")","")
+            break
+
+
+# -------------------------------------------------------------------------
+# Detect GPU model name using nvidia-smi command. Note this could not work
+# inside HPC context where modules environment doesn't let users use 
+# nvidia-smi.
+# -------------------------------------------------------------------------
+try:
+    result = subprocess.check_output(
+        ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+        encoding="utf-8"
+    )
+    gpus = [line.strip() for line in result.splitlines() if line.strip()]
+    if gpus:
+
+        for i, gpu in enumerate(gpus):
+            print(f"GPU {i}: {gpu}")
+            if i == 0:
+                gpu_name = gpu
+        gpu_name = gpu_name.replace(" ","_")
+    else:
+       gpu_name = 'not_present'
+except FileNotFoundError:
+    gpu_name = 'not_present'
+
 
 current_date = datetime.date.today()
 
-file1 = 'results/bipart_perf_xeon_4214R_24cores_t12.csv'
-
-
-
-
-
+file1 = '../figure_plotting/results/bipart_perf_xeon_4214R_24cores_t12.csv'
 
 colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", 
           "#800080", "#ffc0cb", "#ffa500", "#808080", 
@@ -38,12 +67,12 @@ colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00",
 
 
 def compare_across_gpus(k):
-    file1 = 'results/bipart_perf_xeon_4214R_24cores_t12.csv'
-    file2 = '../results/hipeac_ghypart_NVIDIA_GeForce_GTX_1060_3GB_t8_2025-11-22.csv'
-    file3 = '../results/hipeac_ghypart_NVIDIA_GeForce_RTX_2070_t12_2025-11-21.csv'
-    file4 = '../results/hipeac_ghypart_QUADRO_RTX_5000_2025-11-22.csv'
-    file5 = '../results/hipeac_ghypart_NVIDIA_GeForce_RTX_4090_t32_2025-09-14.csv'
-    file6 = 'results/works_all_comp_3090_2024-01-08.csv'
+    file1 = '../figure_plotting/results/bipart_perf_xeon_4214R_24cores_t12.csv'
+    file2 = '../hipeac_results/hipeac_ghypart_NVIDIA_GeForce_GTX_1060_3GB_t8_2025-11-22.csv'
+    file3 = '../hipeac_results/hipeac_ghypart_NVIDIA_GeForce_RTX_2070_t12_2025-11-21.csv'
+    file4 = '../hipeac_results/hipeac_ghypart_QUADRO_RTX_5000_2025-11-22.csv'
+    file5 = '../hipeac_results/hipeac_ghypart_NVIDIA_GeForce_RTX_4090_t32_2025-09-14.csv'
+    file6 = '../figure_plotting/results/works_all_comp_3090_2024-01-08.csv'
     
     data1 = pd.read_csv(file1)
     data2 = pd.read_csv(file2)
@@ -62,8 +91,7 @@ def compare_across_gpus(k):
     merged_data = pd.concat([data1['BiPart'],data2['GTX-1060'] ,data3['RTX-2070'], data4['QUADRO-5000'],data5['RTX-4090'],data6['RTX-3090']], axis=1)
     print(merged_data)
     
-    #return
-    merged_data['g_ratio'] = merged_data['BiPart'] / merged_data['RTX-4090'] # merged_data['best']
+    merged_data['g_ratio'] = merged_data['BiPart'] / merged_data['RTX-4090']
     merged_data = merged_data.sort_values(by='g_ratio')
     y1 = merged_data['BiPart']
     y6 = merged_data['GTX-1060']
@@ -83,17 +111,11 @@ def compare_across_gpus(k):
 
     fig, ax = plt.subplots(figsize=(30, 11))
     ylim = 100
-    #ax.set_yscale('log', base=10)  # 设置纵坐标为log2刻度
-    #ax.set_ylim(0, ylim)  # 设置纵坐标起始值为0
-    #ax.yaxis.set_ticks([0.1, 1, 10, 100, ylim])  # 设置刻度值
-    # ax.yaxis.set_ticks([0.1, 1, 10, ylim])  # 设置刻度值
     ax.tick_params(axis='y', which='major', labelsize=48)
-    ax.set_ylabel('Speedup over BiPart', va='center', fontsize=60, fontweight='bold', labelpad=45)  # 设置纵坐标title
+    ax.set_ylabel('Speedup over BiPart', va='center', fontsize=60, fontweight='bold', labelpad=45)  
     ax.set_xlabel('Hypergraphs', va='center', fontsize=60, fontweight='bold', labelpad=40)
     
     xlim = 600
-    # xlim = 2.2
-    # ax.set_xlim(0,len(x)+1)
     ax.set_xlim(0, xlim)
     app_ticks = [0, 100, 200, 300, 400, len(x)-1, 505]
     ax.xaxis.set_ticks([0, 100, 200, 300, 400, len(x)-1])
@@ -132,8 +154,7 @@ def compare_across_gpus(k):
 
     ax.axvline([len(x) + 15], color='grey', linestyle='dashed', linewidth=2)
 
-    ax.yaxis.grid(True, color='gray', linestyle = '--', linewidth = 0.5)  # horizontal grid, another method
-    # 设置y轴刻度标签加粗
+    ax.yaxis.grid(True, color='gray', linestyle = '--', linewidth = 0.5)  
     for tick in ax.yaxis.get_major_ticks():
         tick.label1.set_fontweight('bold')
         
@@ -144,7 +165,6 @@ def compare_across_gpus(k):
     ax.set_xticklabels(xticklabels)
 
     xtick_labels = ax.get_xticklabels()
-    # 设置最后一个xtick label的大小、角度和颜色
     last_xtick_label = xtick_labels[-1]
     last_xtick_label.set_fontsize(50)
     last_xtick_label.set_rotation(0)
@@ -166,9 +186,9 @@ def compare_across_gpus(k):
     handles, labels = ax.get_legend_handles_labels()
     legend = ax.legend(handles, labels, bbox_to_anchor=(0.45, 0.88), loc='center', ncol=3, fontsize=35, frameon=True)
     frame = legend.get_frame()
-    frame.set_edgecolor('#808080')  # 设置边框颜色
-    frame.set_linewidth(2)  # 设置边框粗细
-    frame.set_alpha(1)  # 设置边框透明度
+    frame.set_edgecolor('#808080') 
+    frame.set_linewidth(2)  
+    frame.set_alpha(1) 
 
     spines = ax.spines
     spines['top'].set_linewidth(5)
@@ -176,15 +196,11 @@ def compare_across_gpus(k):
     spines['left'].set_linewidth(5)
     spines['right'].set_linewidth(5)
 
-    # 调整布局以适应标签
     plt.tight_layout()
 
-    output = f'results/hipeac_figure_new_compare_gpus.pdf'
+    output = f'figures/hipeac_figure_new_compare_gpus.pdf'
 
-    # 保存图片
     plt.savefig(output, dpi=300, bbox_inches='tight')
-
-    # 显示图形  
     plt.show()
 
 

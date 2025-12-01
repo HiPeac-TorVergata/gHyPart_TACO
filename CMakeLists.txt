@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.18)  # modern CUDA arch detection needs ≥ 3.18
 project(gpuHgrPar LANGUAGES CXX CUDA)
 
-# -----------------------------
+# ---------------------------------------------------------------------------
 #  Detect CUDA (stop if missing)
-# -----------------------------
+# ---------------------------------------------------------------------------
 include(CheckLanguage)
 check_language(CUDA)
 
@@ -13,7 +13,10 @@ endif()
 
 enable_language(CUDA)
 
-# --- Detect GPU compute capability using nvidia-smi ------------------------
+
+# ---------------------------------------------------------------------------
+#  Detect GPU compute capability using nvidia-smi
+# ---------------------------------------------------------------------------
 execute_process(
     COMMAND nvidia-smi --query-gpu=compute_cap --format=csv,noheader
     OUTPUT_VARIABLE GPU_COMPUTE_CAP_RAW
@@ -37,9 +40,9 @@ endif()
 # ---------------------------------------------------------------------------
 
 
-# -----------------------------
+# ---------------------------------------------------------------------------
 #  Compilation flags
-# -----------------------------
+# ---------------------------------------------------------------------------
 set(CMAKE_CUDA_FLAGS_RELEASE "-O3")
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -O3 -lineinfo -fopenmp")
 
@@ -57,9 +60,9 @@ include_directories(
     .
 )
 
-# -----------------------------
+# ---------------------------------------------------------------------------
 #   Sources
-# -----------------------------
+# ---------------------------------------------------------------------------
 set(GPU_HGR_PAR_SOURCE_FILES
     kernels/coarsening_kernels.cuh
     kernels/coarsening_kernels.cu
@@ -119,9 +122,9 @@ set(GPU_HGR_PAR_SOURCE_FILES
     main.cu
 )
 
-# -----------------------------
+# ---------------------------------------------------------------------------
 #   Executable
-# -----------------------------
+# ---------------------------------------------------------------------------
 add_executable(gHyPart ${GPU_HGR_PAR_SOURCE_FILES})
 
 find_package(OpenMP REQUIRED)

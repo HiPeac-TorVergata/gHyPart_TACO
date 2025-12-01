@@ -1,4 +1,4 @@
-id,dataset,total_hyperedges,k=2,k=3,k=4,
+id,dataset,hedges,k=2,k=3,k=4,
 0,sat_10pipe_d,2082017,24972,28271,47316,
 1,sat_10pipe,155278,80589,146255,176615,
 2,sat_10pipe_p,77639,62837,155027,184516,

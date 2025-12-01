@@ -12,7 +12,9 @@ nparts = [2, 3, 4]
 edgecut_output = "../results/prof_ghypart_3090.csv"
 our_policy_list = ['-RAND', '-HDH', '-LDH', '-LSNWH', '-HSNWH', '-LRH', '-HRH']
 
-perf_results = f'../results/hipeac_ghypart_{input.gpu_name}_t{input.num_thread}_{current_date}.csv'
+# perf_results = "../results/ghypart_perf_RTX3090.csv"
+perf_results = f"../results/ghypart_perf_RTX3090_{current_date}.csv"
+
 
 ref_results = "../results/quality_comp_all_240112.csv"
 
@@ -26,20 +28,13 @@ gp_policy = data['policy1']
 
 
 def prof_ghypart_results():
-    cmd = f"mkdir -p ../build && cd ../build && cmake .. -DCMAKE_BUILD_TYPE=RELEASE && make -j"
-    os.system(cmd)
-    cmd = f"mkdir -p out"
-    os.system(cmd)
-    cmd = f"cd out && mkdir -p ghypart"
-    os.system(cmd)
-    cmd = f"cd out/ghypart && mkdir -p {current_date}"
-    os.system(cmd)
-
-
-
     # with open(edgecut_output, 'w') as out:
     #     out.write("dataset,part2_cut,part2_time,part3_cut,part3_time,part4_cut,part4_time\n")
-    # cmd = f"cd ../build && rm -rf * && cmake .. && make -j8 "
+    
+    # cmd = f"cd ../build_1024 && rm -rf * && cmake .. && make -j8 "
+    cmd = f"cd ../build_1024 && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
+    os.system(cmd)
+    
     with open(perf_results, 'w') as out:
         out.write("id,dataset,k=2,k=3,k=4,\n")
     with open(perf_results, 'a') as out:
@@ -53,7 +48,7 @@ def prof_ghypart_results():
                 for n in nparts:
                     LOG = "run-ghypart.log"
                     file_path = input.os.path.join(input.dir_path, key)
-                    cmd = f"../build/gHyPart "
+                    cmd = f"../build_1024/gHyPart "
                     cmd += f"{file_path} "
                     cmd += f"-bp -wc 0 -useuvm 0 -sort_input 0 "
                     cmd += f"-useSelection 1 "
@@ -67,7 +62,6 @@ def prof_ghypart_results():
                     input.subprocess.call(cmd, shell=True)
                     
                     with open(f'{LOG}', 'r') as file:
-                        ghypart = 0.0
                         for line in file:
                             # 使用正则表达式匹配包含特定文本格式的行
                             match = re.search(r'Total k-way partition time \(s\): (\d+\.\d+)', line)
@@ -87,7 +81,7 @@ def prof_ghypart_results():
 perf_breakdown = f"../results/overP2/kernel_percentage_all_overP2_warmup.csv"
 
 def prof_ghypart_breakdown():
-    cmd = f"cd ../build && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
+    cmd = f"cd ../build_1024 && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
     os.system(cmd)
     
     # with open(perf_breakdown, 'w') as out:
@@ -102,7 +96,7 @@ def prof_ghypart_breakdown():
                 print(count, value)
                 LOG = "run-ghypart.log"
                 file_path = input.os.path.join(input.dir_path, key)
-                cmd = f"../build/gHyPart "
+                cmd = f"../build_1024/gHyPart "
                 cmd += f"{file_path} "
                 cmd += f"-bp -wc 0 -useuvm 0 -sort_input 0 "
                 cmd += f"-useSelection 1 "
@@ -135,7 +129,7 @@ def prof_ghypart_breakdown():
 
 
 def prof_ghypart_kernel_breakdown():
-    cmd = f"cd ../build && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
+    cmd = f"cd ../build_1024 && cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make -j "
     os.system(cmd)
     
     with open(perf_breakdown, 'w') as out:
@@ -153,7 +147,7 @@ def prof_ghypart_kernel_breakdown():
             print(count, value)
             LOG = "run-ghypart.log"
             file_path = input.os.path.join(input.dir_path, key)
-            cmd = f"../build/gHyPart "
+            cmd = f"../build_1024/gHyPart "
             cmd += f"{file_path} "
             cmd += f"-bp -wc 0 -useuvm 0 -sort_input 0 "
             cmd += f"-usenewkernel12 0 -newParBaseK12 1 "

@@ -1,32 +1,18 @@
-import csv
-import random
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
 import os
 import pandas as pd
-# sys.path.append(".")
-# import myplot
 import matplotlib
 import os
 if os.environ.get('DISPLAY', '') == '':
     matplotlib.use('Agg')
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import MultipleLocator
-from matplotlib.ticker import ScalarFormatter
 from matplotlib.ticker import FuncFormatter
-from matplotlib.font_manager import FontProperties
-from matplotlib.ticker import PercentFormatter
-import seaborn as sns
-from adjustText import adjust_text
 from scipy.stats import gmean
-from matplotlib.gridspec import GridSpec
 import datetime
 
 current_date = datetime.date.today()
 
-# file = 'overP2/benchmarks_all_patterns_3090_20240102_allversions.csv'
 file = 'results/benchmarks_all_patterns_real_hypergraphs_4060Ti_2024-01-08.csv'
 file1= '../scripts/hipeac_ghypart_B_NVIDIA_GeForce_GTX_1060_3GB_t8_2025-11-25.csv'
 file2 = 'results/bipart_perf_xeon_4214R_24cores_t12.csv'
